@@ -7,29 +7,28 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class WeatherService {
-
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final String BASE_URL = "https://api.openweathermap.org/data/2.5/weather";
-
-    @Value("${api.key}")
+    @Value("${openweathermap.api.key}")
     private String apiKey;
 
-    public WeatherData getWeather(String city) {
-        String url = String.format("%s?q=%s&units=metric&appid=%s",
-                BASE_URL,
-                city,
-                apiKey);
+    private final RestTemplate restTemplate = new RestTemplate();
 
+    public WeatherData getWeather(String city, Double lat, Double lon) {
+        String url = buildUrl(city, lat, lon);
         return restTemplate.getForObject(url, WeatherData.class);
     }
 
-    public WeatherData getWeatherByCoordinates(double lat, double lon) {
-        String url = String.format("%s?lat=%f&lon=%f&units=metric&appid=%s",
-                BASE_URL,
-                lat,
-                lon,
-                apiKey);
+    private String buildUrl(String city, Double lat, Double lon) {
+        String baseUrl = "https://api.openweathermap.org/data/2.5/weather?appid=%s&units=metric";
+        String url;
 
-        return restTemplate.getForObject(url, WeatherData.class);
+        if (city != null && !city.isEmpty()) {
+            url = String.format(baseUrl + "&q=%s", apiKey, city);
+        } else if (lat != null && lon != null) {
+            url = String.format(baseUrl + "&lat=%f&lon=%f", apiKey, lat, lon);
+        } else {
+            throw new IllegalArgumentException("Укажите город или координаты.");
+        }
+
+        return url;
     }
 }
