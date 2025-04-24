@@ -1,5 +1,6 @@
 package com.example.demo11.service;
 
+import com.example.demo11.cache.CacheManager;
 import com.example.demo11.model.WeatherData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,16 +15,29 @@ public class WeatherService {
     private String apiKey;
 
     private final RestTemplate restTemplate;
+    private final CacheManager cacheManager;
 
     @Autowired
-    public WeatherService(RestTemplate restTemplate) {
+    public WeatherService(RestTemplate restTemplate, CacheManager cacheManager) {
         this.restTemplate = restTemplate;
+        this.cacheManager = cacheManager;
     }
 
     public WeatherData getWeather(String city, Double lat, Double lon) {
+        String cacheKey = buildCacheKey(city, lat, lon);
+
+        Object cachedWeatherData = cacheManager.getWeatherData(cacheKey);
+        if (cachedWeatherData != null) {
+            return (WeatherData) cachedWeatherData;
+        }
+
         String url = buildUrl(city, lat, lon);
         try {
-            return restTemplate.getForObject(url, WeatherData.class);
+            WeatherData weatherData = restTemplate.getForObject(url, WeatherData.class);
+            if (weatherData != null) {
+                cacheManager.putWeatherData(cacheKey, weatherData);
+            }
+            return weatherData;
         } catch (HttpClientErrorException e) {
             throw new RuntimeException("Ошибка запроса к OpenWeatherMap: " + e.getMessage());
         }
@@ -42,5 +56,14 @@ public class WeatherService {
         }
 
         return urlBuilder.toString();
+    }
+
+    private String buildCacheKey(String city, Double lat, Double lon) {
+        if (city != null && !city.isEmpty()) {
+            return "city:" + city;
+        } else if (lat != null && lon != null) {
+            return "lat:" + lat + ":lon:" + lon;
+        }
+        return "";
     }
 }

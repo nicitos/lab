@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -56,5 +57,16 @@ public class WeatherRecordController {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/by-city-and-date")
+    public List<WeatherRecord> getWeatherRecordsByCityAndDate(
+            @RequestParam Long cityId,
+            @RequestParam String startDate,
+            @RequestParam String endDate
+    ) {
+        LocalDateTime start = LocalDateTime.parse(startDate);
+        LocalDateTime end = LocalDateTime.parse(endDate);
+        return weatherRecordService.getWeatherRecordsByCityAndDateRange(cityId, start, end);
     }
 }
