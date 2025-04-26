@@ -1,7 +1,7 @@
 package com.example.demo11.service;
 
 import com.example.demo11.cache.CacheManager;
-import com.example.demo11.model.WeatherData;
+import com.example.demo11.dto.WeatherData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

@@ -1,6 +1,7 @@
-package com.example.demo11.model;
+package com.example.demo11.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Map;
 
 public class WeatherData {

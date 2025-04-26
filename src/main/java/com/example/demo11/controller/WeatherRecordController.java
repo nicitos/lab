@@ -59,7 +59,7 @@ public class WeatherRecordController {
         return ResponseEntity.notFound().build();
     }
 
-    @GetMapping("/by-city-and-date")
+    @GetMapping("/by_city_and_date")
     public List<WeatherRecord> getWeatherRecordsByCityAndDate(
             @RequestParam Long cityId,
             @RequestParam String startDate,

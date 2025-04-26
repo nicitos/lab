@@ -1,6 +1,6 @@
 package com.example.demo11.controller;
 
-import com.example.demo11.model.WeatherData;
+import com.example.demo11.dto.WeatherData;
 import com.example.demo11.service.WeatherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

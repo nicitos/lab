@@ -26,18 +26,28 @@ public class WeatherRecordService {
 
         if (savedRecord.getId() != null) {
             cacheManager.clearWeatherRecordCache(savedRecord.getId());
-
             cacheManager.clearWeatherRecordsByParamsCache("cityId:" + savedRecord.getCity().getId());
+
+            cacheManager.clearAllWeatherRecordsCache();
         }
         return savedRecord;
     }
 
     public List<WeatherRecord> getAllWeatherRecords() {
-        return weatherRecordRepository.findAll();
+
+        String cacheKey = "allWeatherRecords";
+        List<Object> cachedRecords = cacheManager.getAllWeatherRecords(cacheKey);
+        if (cachedRecords != null) {
+            return cachedRecords.stream().map(obj -> (WeatherRecord) obj).toList();
+        }
+
+
+        List<WeatherRecord> records = weatherRecordRepository.findAll();
+        cacheManager.putAllWeatherRecords(cacheKey, records.stream().map(obj -> (Object) obj).toList());
+        return records;
     }
 
     public Optional<WeatherRecord> getWeatherRecordById(Long id) {
-        // Проверяем кэш
         Object cachedRecord = cacheManager.getWeatherRecord(id);
         if (cachedRecord != null) {
             return Optional.of((WeatherRecord) cachedRecord);
@@ -50,8 +60,12 @@ public class WeatherRecordService {
 
     public void deleteWeatherRecord(Long id) {
         weatherRecordRepository.deleteById(id);
+
         cacheManager.clearWeatherRecordCache(id);
+
         cacheManager.clearWeatherRecordsByParamsCache("cityId:" + id);
+
+        cacheManager.clearAllWeatherRecordsCache();
     }
 
     public List<WeatherRecord> getWeatherRecordsByCityAndDateRange(Long cityId, LocalDateTime startDate, LocalDateTime endDate) {

@@ -21,8 +21,11 @@ public class CacheManager {
     // Кэш для списка всех городов
     private final Map<String, List<Object>> allCitiesCache = new HashMap<>();
 
-    // Кэш для данных о погatherMap
+    // Кэш для данных о погоде из OpenWeatherMap
     private final Map<String, Object> weatherDataCache = new HashMap<>();
+
+    // Кэш для списка всех WeatherRecord
+    private final Map<String, List<Object>> allWeatherRecordsCache = new HashMap<>();
 
     // Методы для WeatherRecord
     public void putWeatherRecord(Long id, Object weatherRecord) {
@@ -85,5 +88,18 @@ public class CacheManager {
 
     public void clearWeatherDataCache(String key) {
         weatherDataCache.remove(key);
+    }
+
+    // Методы для списка всех WeatherRecord
+    public void putAllWeatherRecords(String key, List<Object> records) {
+        allWeatherRecordsCache.put(key, records);
+    }
+
+    public List<Object> getAllWeatherRecords(String key) {
+        return allWeatherRecordsCache.get(key);
+    }
+
+    public void clearAllWeatherRecordsCache() {
+        allWeatherRecordsCache.clear();
     }
 }
