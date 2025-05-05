@@ -39,7 +39,13 @@ public class WeatherService {
             }
             return weatherData;
         } catch (HttpClientErrorException e) {
-            throw new RuntimeException("Ошибка запроса к OpenWeatherMap: " + e.getMessage());
+            if (e.getStatusCode().value() == 404) {
+                throw new IllegalArgumentException("Город или координаты не найдены");
+            } else if (e.getStatusCode().value() == 401) {
+                throw new IllegalArgumentException("Неверный API-ключ");
+            } else {
+                throw new RuntimeException("Ошибка при запросе к OpenWeatherMap: " + e.getMessage());
+            }
         }
     }
 
