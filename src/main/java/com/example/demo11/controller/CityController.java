@@ -85,4 +85,21 @@ public class CityController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PostMapping("/bulk")
+    @Operation(summary = "Создать несколько городов")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Города успешно созданы"),
+            @ApiResponse(responseCode = "400", description = "Некорректные данные города")
+    })
+    public ResponseEntity<List<City>> createCities(
+            @RequestBody @Parameter(description = "Список городов для создания") List<City> cities
+    ) {
+        try {
+            List<City> savedCities = cityService.saveAllCities(cities);
+            return ResponseEntity.ok(savedCities);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 }

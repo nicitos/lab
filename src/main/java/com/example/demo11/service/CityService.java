@@ -54,8 +54,17 @@ public class CityService {
 
     public void deleteCity(Long id) {
         cityRepository.deleteById(id);
-        // Очищаем кэш после удаления
         cacheManager.clearCityCache(id);
         cacheManager.clearAllCitiesCache();
+    }
+
+    public List<City> saveAllCities(List<City> cities) {
+        if (cities.stream().anyMatch(city -> city.getName() == null || city.getName().isEmpty())) {
+            throw new IllegalArgumentException("City name cannot be null or empty");
+        }
+        List<City> savedCities = cityRepository.saveAll(cities);
+        cacheManager.clearAllCitiesCache();
+        savedCities.forEach(city -> cacheManager.clearCityCache(city.getId()));
+        return savedCities;
     }
 }
