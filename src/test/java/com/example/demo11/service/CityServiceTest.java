@@ -30,13 +30,14 @@ public class CityServiceTest {
     @InjectMocks
     private CityService cityService;
 
+    @Mock
     private City city;
 
     @BeforeEach
     public void setUp() {
-        city = new City();
-        city.setId(1L);
-        city.setName("Test City");
+        // Настраиваем поведение мока City
+        when(city.getId()).thenReturn(1L);
+        when(city.getName()).thenReturn("Test City");
     }
 
     @Test
@@ -46,7 +47,7 @@ public class CityServiceTest {
         assertNotNull(savedCity);
         assertEquals("Test City", savedCity.getName());
         verify(cityRepository, times(1)).save(city);
-        verify(cacheManager, times(1)).clearCityCache(city.getId());
+        verify(cacheManager, times(1)).clearCityCache(1L);
         verify(cacheManager, times(1)).clearAllCitiesCache();
     }
 
@@ -57,9 +58,10 @@ public class CityServiceTest {
         when(cityRepository.findAll()).thenReturn(cities);
         List<City> result = cityService.getAllCities();
         assertEquals(1, result.size());
+        assertEquals("Test City", result.get(0).getName());
         verify(cacheManager, times(1)).getAllCities("allCities");
         verify(cityRepository, times(1)).findAll();
-        verify(cacheManager, times(1)).putAllCities("allCities", cities.stream().map(obj -> (Object) obj).toList());
+        verify(cacheManager, times(1)).putAllCities(eq("allCities"), anyList());
     }
 
     @Test
@@ -68,6 +70,7 @@ public class CityServiceTest {
         when(cacheManager.getAllCities("allCities")).thenReturn(cities.stream().map(obj -> (Object) obj).toList());
         List<City> result = cityService.getAllCities();
         assertEquals(1, result.size());
+        assertEquals("Test City", result.get(0).getName());
         verify(cacheManager, times(1)).getAllCities("allCities");
         verify(cityRepository, never()).findAll();
     }
@@ -115,36 +118,44 @@ public class CityServiceTest {
 
     @Test
     public void testSaveAllCities() {
-        City city1 = new City();
-        city1.setName("City1");
-        City city2 = new City();
-        city2.setName("City2");
+        // Создаём моки для списка городов
+        City city1 = mock(City.class);
+        City city2 = mock(City.class);
         List<City> cities = Arrays.asList(city1, city2);
-        City savedCity1 = new City();
-        savedCity1.setId(1L);
-        savedCity1.setName("City1");
-        City savedCity2 = new City();
-        savedCity2.setId(2L);
-        savedCity2.setName("City2");
+
+        // Настраиваем поведение моков
+        when(city1.getName()).thenReturn("City1");
+        when(city2.getName()).thenReturn("City2");
+
+        // Настраиваем возвращаемые значения после сохранения
+        City savedCity1 = mock(City.class);
+        City savedCity2 = mock(City.class);
+        when(savedCity1.getId()).thenReturn(1L);
+        when(savedCity1.getName()).thenReturn("City1");
+        when(savedCity2.getId()).thenReturn(2L);
+        when(savedCity2.getName()).thenReturn("City2");
         List<City> savedCities = Arrays.asList(savedCity1, savedCity2);
+
         when(cityRepository.saveAll(cities)).thenReturn(savedCities);
         List<City> result = cityService.saveAllCities(cities);
         assertEquals(2, result.size());
         assertEquals("City1", result.get(0).getName());
         assertEquals("City2", result.get(1).getName());
         verify(cityRepository, times(1)).saveAll(cities);
-        verify(cacheManager, times(1)).clearAllCitiesCache();
-        verify(cacheManager, times(1)).clearCityCache(1L);
-        verify(cacheManager, times(1)).clearCityCache(2L);
+        verify(cacheManager, times(1)).putCitiesBulk(savedCities);
     }
 
     @Test
     public void testSaveAllCitiesWithInvalidCity() {
-        City city1 = new City();
-        city1.setName("City1");
-        City city2 = new City();
-        city2.setName("");
+        // Создаём моки для списка городов
+        City city1 = mock(City.class);
+        City city2 = mock(City.class);
         List<City> cities = Arrays.asList(city1, city2);
+
+        // Настраиваем поведение моков
+        when(city1.getName()).thenReturn("City1");
+        when(city2.getName()).thenReturn("");
+
         assertThrows(IllegalArgumentException.class, () -> cityService.saveAllCities(cities));
         verify(cityRepository, never()).saveAll(anyList());
     }

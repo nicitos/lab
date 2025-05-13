@@ -13,14 +13,17 @@ import java.util.Optional;
 public class CityService {
     private final CityRepository cityRepository;
     private final CacheManager cacheManager;
+    private final AccessCounter accessCounter;
 
     @Autowired
-    public CityService(CityRepository cityRepository, CacheManager cacheManager) {
+    public CityService(CityRepository cityRepository, CacheManager cacheManager, AccessCounter accessCounter) {
         this.cityRepository = cityRepository;
         this.cacheManager = cacheManager;
+        this.accessCounter = accessCounter;
     }
 
     public City saveCity(City city) {
+        accessCounter.increment();
         City savedCity = cityRepository.save(city);
         if (savedCity.getId() != null) {
             cacheManager.clearCityCache(savedCity.getId());
@@ -30,6 +33,7 @@ public class CityService {
     }
 
     public List<City> getAllCities() {
+        accessCounter.increment();
         String cacheKey = "allCities";
         List<Object> cachedCities = cacheManager.getAllCities(cacheKey);
         if (cachedCities != null) {
@@ -42,6 +46,7 @@ public class CityService {
     }
 
     public Optional<City> getCityById(Long id) {
+        accessCounter.increment();
         Object cachedCity = cacheManager.getCity(id);
         if (cachedCity != null) {
             return Optional.of((City) cachedCity);
@@ -53,18 +58,19 @@ public class CityService {
     }
 
     public void deleteCity(Long id) {
+        accessCounter.increment();
         cityRepository.deleteById(id);
         cacheManager.clearCityCache(id);
         cacheManager.clearAllCitiesCache();
     }
 
     public List<City> saveAllCities(List<City> cities) {
+        accessCounter.increment();
         if (cities.stream().anyMatch(city -> city.getName() == null || city.getName().isEmpty())) {
             throw new IllegalArgumentException("City name cannot be null or empty");
         }
         List<City> savedCities = cityRepository.saveAll(cities);
-        cacheManager.clearAllCitiesCache();
-        savedCities.forEach(city -> cacheManager.clearCityCache(city.getId()));
+        cacheManager.putCitiesBulk(savedCities);
         return savedCities;
     }
 }

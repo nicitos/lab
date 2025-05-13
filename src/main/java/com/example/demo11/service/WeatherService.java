@@ -16,14 +16,17 @@ public class WeatherService {
 
     private final RestTemplate restTemplate;
     private final CacheManager cacheManager;
+    private final AccessCounter accessCounter;
 
     @Autowired
-    public WeatherService(RestTemplate restTemplate, CacheManager cacheManager) {
+    public WeatherService(RestTemplate restTemplate, CacheManager cacheManager, AccessCounter accessCounter) {
         this.restTemplate = restTemplate;
         this.cacheManager = cacheManager;
+        this.accessCounter = accessCounter;
     }
 
     public WeatherData getWeather(String city, Double lat, Double lon) {
+        accessCounter.increment();
         String cacheKey = buildCacheKey(city, lat, lon);
 
         Object cachedWeatherData = cacheManager.getWeatherData(cacheKey);

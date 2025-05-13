@@ -1,6 +1,7 @@
 package com.example.demo11.controller;
 
 import com.example.demo11.model.City;
+import com.example.demo11.service.AccessCounter;
 import com.example.demo11.service.CityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,10 +17,12 @@ import java.util.List;
 @RequestMapping("/cities")
 public class CityController {
     private final CityService cityService;
+    private final AccessCounter accessCounter;
 
     @Autowired
-    public CityController(CityService cityService) {
+    public CityController(CityService cityService, AccessCounter accessCounter) {
         this.cityService = cityService;
+        this.accessCounter = accessCounter;
     }
 
     @GetMapping
@@ -101,5 +104,12 @@ public class CityController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @GetMapping("/access-count")
+    @Operation(summary = "Получить количество обращений к сервису")
+    @ApiResponse(responseCode = "200", description = "Количество обращений успешно получено")
+    public ResponseEntity<Long> getAccessCount() {
+        return ResponseEntity.ok(accessCounter.getCount());
     }
 }

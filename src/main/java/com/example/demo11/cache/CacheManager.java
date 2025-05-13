@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class CacheManager {
@@ -75,6 +76,19 @@ public class CacheManager {
 
     public void clearAllCitiesCache() {
         allCitiesCache.clear();
+    }
+
+    // Новый метод для массового добавления городов в кэш
+    public void putCitiesBulk(List<?> cities) {
+        cities.forEach(city -> {
+            try {
+                Long id = (Long) city.getClass().getMethod("getId").invoke(city);
+                cityCache.put(id, city);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to cache city with ID: " + e.getMessage());
+            }
+        });
+        allCitiesCache.put("allCities", cities.stream().map(obj -> (Object) obj).collect(Collectors.toList()));
     }
 
     // Методы для WeatherData
