@@ -1,6 +1,7 @@
 package com.example.demo11.controller;
 
 import com.example.demo11.model.WeatherRecord;
+import com.example.demo11.service.AccessCounter;
 import com.example.demo11.service.WeatherRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,10 +19,12 @@ import java.util.List;
 @RequestMapping("/weather-records")
 public class WeatherRecordController {
     private final WeatherRecordService weatherRecordService;
+    private final AccessCounter accessCounter;
 
     @Autowired
-    public WeatherRecordController(WeatherRecordService weatherRecordService) {
+    public WeatherRecordController(WeatherRecordService weatherRecordService, AccessCounter accessCounter) {
         this.weatherRecordService = weatherRecordService;
+        this.accessCounter = accessCounter;
     }
 
     @GetMapping
@@ -110,5 +113,20 @@ public class WeatherRecordController {
         } catch (DateTimeException e) {
             throw new IllegalArgumentException("Неверный формат даты. Используйте ISO формат, например, 2025-04-21T00:00:00");
         }
+    }
+
+    @GetMapping("/access-count")
+    @Operation(summary = "Получить количество обращений к сервису погодных записей")
+    @ApiResponse(responseCode = "200", description = "Количество обращений успешно получено")
+    public ResponseEntity<Long> getAccessCount() {
+        return ResponseEntity.ok(accessCounter.getCount());
+    }
+
+    @PostMapping("/access-count/reset")
+    @Operation(summary = "Сбросить счетчик обращений к сервису погодных записей")
+    @ApiResponse(responseCode = "200", description = "Счетчик успешно сброшен")
+    public ResponseEntity<Void> resetAccessCount() {
+        accessCounter.reset();
+        return ResponseEntity.ok().build();
     }
 }

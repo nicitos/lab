@@ -1,20 +1,26 @@
 package com.example.demo11.controller;
 
 import com.example.demo11.dto.WeatherData;
+import com.example.demo11.service.AccessCounter;
 import com.example.demo11.service.WeatherService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class WeatherController {
+    private final WeatherService weatherService;
+    private final AccessCounter accessCounter;
+
     @Autowired
-    private WeatherService weatherService;
+    public WeatherController(WeatherService weatherService, AccessCounter accessCounter) {
+        this.weatherService = weatherService;
+        this.accessCounter = accessCounter;
+    }
 
     @GetMapping("/weather")
     @Operation(summary = "Получить текущую погоду по городу или координатам")
@@ -29,5 +35,20 @@ public class WeatherController {
             @RequestParam(required = false) @Parameter(description = "Долгота") Double lon
     ) {
         return weatherService.getWeather(city, lat, lon);
+    }
+
+    @GetMapping("/weather/access-count")
+    @Operation(summary = "Получить количество обращений к сервису погоды")
+    @ApiResponse(responseCode = "200", description = "Количество обращений успешно получено")
+    public ResponseEntity<Long> getAccessCount() {
+        return ResponseEntity.ok(accessCounter.getCount());
+    }
+
+    @PostMapping("/weather/access-count/reset")
+    @Operation(summary = "Сбросить счетчик обращений к сервису погоды")
+    @ApiResponse(responseCode = "200", description = "Счетчик успешно сброшен")
+    public ResponseEntity<Void> resetAccessCount() {
+        accessCounter.reset();
+        return ResponseEntity.ok().build();
     }
 }

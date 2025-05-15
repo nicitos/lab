@@ -112,4 +112,12 @@ public class CityController {
     public ResponseEntity<Long> getAccessCount() {
         return ResponseEntity.ok(accessCounter.getCount());
     }
+
+    @PostMapping("/access-count/reset")
+    @Operation(summary = "Сбросить счетчик обращений к сервису")
+    @ApiResponse(responseCode = "200", description = "Счетчик успешно сброшен")
+    public ResponseEntity<Void> resetAccessCount() {
+        accessCounter.reset();
+        return ResponseEntity.ok().build();
+    }
 }
