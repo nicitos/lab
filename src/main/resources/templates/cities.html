@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Список городов</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .action-btn { margin-right: 5px; }
+    </style>
+</head>
+<body>
+<h1>Список городов</h1>
+<a th:href="@{/cities/ui/cities/add}">Добавить город</a>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Название</th>
+        <th>Действия</th>
+    </tr>
+    <tr th:each="city : ${cities}">
+        <td th:text="${city.id}">ID</td>
+        <td th:text="${city.name}">Название</td>
+        <td>
+            <a th:href="@{/cities/ui/cities/{id}(id=${city.id})}" class="action-btn">Подробнее</a>
+            <a th:href="@{/cities/ui/cities/edit/{id}(id=${city.id})}" class="action-btn">Редактировать</a>
+            <form th:action="@{/cities/ui/cities/delete/{id}(id=${city.id})}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Удалить город?')">Удалить</button>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

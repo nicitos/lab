@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Детали города</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<h1 th:text="${city.name} + ' (ID: ' + ${city.id} + ')'">Название города</h1>
+<a th:href="@{/cities/ui/cities}">Назад</a>
+<h2>Погодные записи</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>Температура</th>
+        <th>Скорость ветра</th>
+        <th>Облачность</th>
+        <th>Дата</th>
+    </tr>
+    <tr th:each="record : ${city.weatherRecords}">
+        <td th:text="${record.id}">ID</td>
+        <td th:text="${record.temperature} + '°C'">Температура</td>
+        <td th:text="${record.windSpeed} + ' м/с'">Скорость ветра</td>
+        <td th:text="${record.cloudiness} + '%'">Облачность</td>
+        <td th:text="${#temporals.format(record.timestamp, 'yyyy-MM-dd HH:mm')}">Дата</td>
+    </tr>
+</table>
+<a th:href="@{/weather-records/ui/records/add}">Добавить запись</a>
+</body>
+</html>

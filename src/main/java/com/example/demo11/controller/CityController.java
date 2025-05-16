@@ -9,11 +9,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/cities")
 public class CityController {
     private final CityService cityService;
@@ -25,11 +27,12 @@ public class CityController {
         this.accessCounter = accessCounter;
     }
 
+    // REST API эндпоинты
     @GetMapping
     @Operation(summary = "Получить список всех городов")
     @ApiResponse(responseCode = "200", description = "Список городов успешно получен")
-    public List<City> getAllCities() {
-        return cityService.getAllCities();
+    public ResponseEntity<List<City>> getAllCities() {
+        return ResponseEntity.ok(cityService.getAllCities());
     }
 
     @GetMapping("/{id}")
@@ -49,10 +52,10 @@ public class CityController {
     @PostMapping
     @Operation(summary = "Создать новый город")
     @ApiResponse(responseCode = "200", description = "Город успешно создан")
-    public City createCity(
+    public ResponseEntity<City> createCity(
             @RequestBody @Parameter(description = "Данные города") City city
     ) {
-        return cityService.saveCity(city);
+        return ResponseEntity.ok(cityService.saveCity(city));
     }
 
     @PutMapping("/{id}")
@@ -119,5 +122,52 @@ public class CityController {
     public ResponseEntity<Void> resetAccessCount() {
         accessCounter.reset();
         return ResponseEntity.ok().build();
+    }
+
+    // UI методы
+    @GetMapping("/ui/cities")
+    public String getCitiesPage(Model model) {
+        List<City> cities = cityService.getAllCities();
+        model.addAttribute("cities", cities);
+        return "cities";
+    }
+
+    @GetMapping("/ui/cities/{id}")
+    public String getCityDetailsPage(@PathVariable Long id, Model model) {
+        cityService.getCityById(id).ifPresent(city -> model.addAttribute("city", city));
+        return "cityDetails";
+    }
+
+    @GetMapping("/ui/cities/add")
+    public String addCityPage(Model model) {
+        model.addAttribute("city", new City());
+        return "addCity";
+    }
+
+    @PostMapping("/ui/cities/add")
+    public String addCitySubmit(@ModelAttribute City city) {
+        cityService.saveCity(city);
+        return "redirect:/cities/ui/cities";
+    }
+
+    @GetMapping("/ui/cities/edit/{id}")
+    public String editCityPage(@PathVariable Long id, Model model) {
+        cityService.getCityById(id).ifPresent(city -> model.addAttribute("city", city));
+        return "editCity";
+    }
+
+    @PostMapping("/ui/cities/edit/{id}")
+    public String editCitySubmit(@PathVariable Long id, @ModelAttribute City cityDetails) {
+        cityService.getCityById(id).ifPresent(city -> {
+            city.setName(cityDetails.getName());
+            cityService.saveCity(city);
+        });
+        return "redirect:/cities/ui/cities";
+    }
+
+    @PostMapping("/ui/cities/delete/{id}")
+    public String deleteCityUi(@PathVariable Long id) {
+        cityService.getCityById(id).ifPresent(city -> cityService.deleteCity(id));
+        return "redirect:/cities/ui/cities";
     }
 }

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Добавить город</title>
+</head>
+<body>
+<h1>Добавить город</h1>
+<a th:href="@{/cities/ui/cities}">Назад</a>
+<form th:action="@{/cities/ui/cities/add}" th:object="${city}" method="post">
+    <label>Название:</label><br>
+    <input type="text" th:field="*{name}" required><br><br>
+    <button type="submit">Добавить</button>
+</form>
+</body>
+</html>
