@@ -1,7 +1,25 @@
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:17-jdk AS builder
 WORKDIR /app
-COPY . /app/
-RUN ./mvnw -DskipTests clean package
-COPY target/demo11.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# Копируем весь контекст сборки
+COPY . .
+
+# Вывод списка файлов для отладки
+RUN echo ">>> Список файлов после COPY:" && ls -l
+
+# Делаем Maven wrapper исполняемым
+RUN chmod +x mvnw
+
+# Собираем приложение с использованием Maven Wrapper в batch-режиме, пропуская тесты
+RUN ./mvnw -B clean package -DskipTests -e
+
+# Вывод содержимого каталога target, чтобы убедиться, что сборка прошла успешно и артефакт создан
+RUN echo ">>> Содержимое target:" && ls -l /app/target
+
+FROM eclipse-temurin:17-jre
+WORKDIR /app
+
+# Копируем собранный JAR из этапа сборки
+COPY --from=builder /app/target/demo11.jar app.jar
+
+ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]
