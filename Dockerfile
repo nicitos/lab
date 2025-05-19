@@ -10,6 +10,10 @@ RUN echo ">>> Список файлов после COPY:" && ls -l
 # Делаем Maven wrapper исполняемым
 RUN chmod +x mvnw
 
+# Проверяем версию Maven и Java
+RUN ./mvnw --version
+RUN java -version
+
 # Собираем приложение с использованием Maven Wrapper в batch-режиме, пропуская тесты
 RUN ./mvnw -B clean package -DskipTests -e
 
