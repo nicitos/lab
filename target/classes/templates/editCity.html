@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Редактировать город</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/scripts.js}"></script>
+</head>
+<body>
+<h1>Редактировать город</h1>
+<a th:href="@{/cities/ui/cities}" class="back-link">Назад</a>
+<div class="form-container">
+    <form th:action="@{/cities/ui/cities/edit/{id}(id=${city.id})}" th:object="${city}" method="post">
+        <label>Название:</label>
+        <input type="text" th:field="*{name}" required>
+        <button type="submit">Сохранить</button>
+    </form>
+</div>
+</body>
+</html>
