@@ -2,16 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Список городов</title>
-    <style>
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .action-btn { margin-right: 5px; }
-    </style>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/scripts.js}"></script>
 </head>
 <body>
 <h1>Список городов</h1>
-<a th:href="@{/cities/ui/cities/add}">Добавить город</a>
+<a th:href="@{/cities/ui/cities/add}" class="action-btn">Добавить город</a>
 <table>
     <tr>
         <th>ID</th>
@@ -24,8 +20,8 @@
         <td>
             <a th:href="@{/cities/ui/cities/{id}(id=${city.id})}" class="action-btn">Подробнее</a>
             <a th:href="@{/cities/ui/cities/edit/{id}(id=${city.id})}" class="action-btn">Редактировать</a>
-            <form th:action="@{/cities/ui/cities/delete/{id}(id=${city.id})}" method="post" style="display:inline;">
-                <button type="submit" onclick="return confirm('Удалить город?')">Удалить</button>
+            <form th:action="@{/cities/ui/cities/delete/{id}(id=${city.id})}" method="post" class="delete-form">
+                <button type="submit">Удалить</button>
             </form>
         </td>
     </tr>

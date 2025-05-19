@@ -18,9 +18,9 @@
 	</parent>
 
 	<properties>
-		<java.version>23</java.version>
-		<maven.compiler.source>23</maven.compiler.source>
-		<maven.compiler.target>23</maven.compiler.target>
+		<java.version>17</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
 		<mysql.version>8.0.33</mysql.version>
 	</properties>
 
@@ -70,12 +70,8 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>com.example</groupId>
-			<artifactId>demo11</artifactId>
-			<version>1.0</version>
-		</dependency>
 
+		<!-- Spring Boot Starter Thymeleaf -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>

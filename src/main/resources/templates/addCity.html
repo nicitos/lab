@@ -2,14 +2,18 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Добавить город</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+    <script th:src="@{/scripts.js}"></script>
 </head>
 <body>
 <h1>Добавить город</h1>
-<a th:href="@{/cities/ui/cities}">Назад</a>
-<form th:action="@{/cities/ui/cities/add}" th:object="${city}" method="post">
-    <label>Название:</label><br>
-    <input type="text" th:field="*{name}" required><br><br>
-    <button type="submit">Добавить</button>
-</form>
+<a th:href="@{/cities/ui/cities}" class="back-link">Назад</a>
+<div class="form-container">
+    <form th:action="@{/cities/ui/cities/add}" th:object="${city}" method="post">
+        <label>Название:</label>
+        <input type="text" th:field="*{name}" required>
+        <button type="submit">Добавить</button>
+    </form>
+</div>
 </body>
 </html>
