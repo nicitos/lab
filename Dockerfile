@@ -26,5 +26,5 @@ WORKDIR /app
 # Копируем собранный JAR из этапа сборки
 COPY --from=builder /app/target/demo11-1.0.jar app.jar
 
-EXPOSE 8080
+
 ENTRYPOINT ["java", "-Xms256m", "-Xmx512m", "-jar", "app.jar"]
